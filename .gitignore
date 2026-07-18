@@ -1,0 +1,18 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+/build
+
+# env
+.env
+.env.*
+
+# ts
+*.tsbuildinfo
+next-env.d.ts
+
+# uploads
+/public/uploads
