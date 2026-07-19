@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: '%s | Sebuah Ruang Khusus',
   },
   description: 'Digital scrapbook & journey dibuat dengan penuh ketulusan.',
-  keywords: ['scrapbook', 'journey', 'memories', 'digital diary'],
+  keywords: ['scrapbook', 'journey', 'memories', 'digital diary', 'denia', 'deby', 'deniaaa', 'denia deby'],
   authors: [{ name: 'Joko' }],
   openGraph: {
     type: 'website',
