@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Image as ImageIcon, Video, X, Check, Loader2, Play, Grid3X3 } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { Camera, Image as ImageIcon, Video, X, Check, Loader2, Grid3X3 } from 'lucide-react';
 
 interface CameraModalProps {
   isOpen: boolean;
@@ -42,15 +42,16 @@ export default function CameraModal({ isOpen, onClose, onSuccess }: CameraModalP
   // Ref for re-stitching state tracking so we don't spam
   const [isStitching, setIsStitching] = useState(false);
 
-  // Stop camera when modal closes or unmounts
-  useEffect(() => {
-    if (!isOpen) {
-      stopCamera();
-      resetState();
-    }
-  }, [isOpen]);
+  const stopCamera = useCallback(() => {
+    setStream((prevStream) => {
+      if (prevStream) {
+        prevStream.getTracks().forEach((track) => track.stop());
+      }
+      return null;
+    });
+  }, []);
 
-  const resetState = () => {
+  const resetState = useCallback(() => {
     setMode('idle');
     setImageBlob(null);
     setPreviewUrl(null);
@@ -64,7 +65,20 @@ export default function CameraModal({ isOpen, onClose, onSuccess }: CameraModalP
     setDescription('');
     setErrorMsg('');
     setIsStitching(false);
-  };
+  }, []);
+
+  const handleClose = useCallback(() => {
+    stopCamera();
+    resetState();
+    onClose();
+  }, [stopCamera, resetState, onClose]);
+
+  // Clean up camera stream on unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
 
   const startCamera = async (isPhotobooth = false) => {
     try {
@@ -85,13 +99,6 @@ export default function CameraModal({ isOpen, onClose, onSuccess }: CameraModalP
       videoRef.current.srcObject = stream;
     }
   }, [stream, mode]);
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-  };
 
   const captureSinglePhoto = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -274,9 +281,10 @@ export default function CameraModal({ isOpen, onClose, onSuccess }: CameraModalP
       if (!saveRes.ok) throw new Error('Gagal menyimpan detail foto.');
       
       onSuccess();
-      onClose();
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Terjadi kesalahan');
+      handleClose();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan';
+      setErrorMsg(msg);
     } finally {
       setIsUploading(false);
     }
@@ -293,7 +301,7 @@ export default function CameraModal({ isOpen, onClose, onSuccess }: CameraModalP
         className={`bg-cream-50 w-full ${mode === 'preview' ? 'max-w-4xl' : 'max-w-xl'} rounded-3xl overflow-hidden relative border border-cream-200 transition-all duration-300`}
       >
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 z-20 p-2 bg-white/50 backdrop-blur-sm rounded-full text-sage-900 hover:bg-rose-50 hover:text-rose-500 transition-colors"
         >
           <X className="h-5 w-5" />

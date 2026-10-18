@@ -61,7 +61,7 @@ export default function OpeningScreen() {
                 Selamat datang di tempat kecil yang aku buat khusus untukmu.
               </h1>
               <p className="text-sm md:text-base text-sage-900/60 font-sans italic">
-                "Beberapa hal lebih baik dijelajahi daripada dijelaskan."
+                &ldquo;Beberapa hal lebih baik dijelajahi daripada dijelaskan.&rdquo;
               </p>
             </div>
 

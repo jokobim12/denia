@@ -3,11 +3,15 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    console.warn('Seeding is disabled in production to protect existing data.');
+    return;
+  }
+
   // Clear database
   await prisma.photo.deleteMany({});
   await prisma.letter.deleteMany({});
   await prisma.timeline.deleteMany({});
-  await prisma.playlist.deleteMany({});
 
   // Seed Photos (Pap / Selfies)
   await prisma.photo.createMany({
@@ -95,19 +99,6 @@ async function main() {
     ],
   });
 
-  // Seed Playlists
-  await prisma.playlist.createMany({
-    data: [
-      {
-        title: 'Acoustic Warmth (Lofi & Chill)',
-        embedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4sWSpwq3LiO?utm_source=generator',
-      },
-      {
-        title: 'Rainy Day Melodies (Indie-Folk)',
-        embedUrl: 'https://open.spotify.com/embed/playlist/37i9dQZF1DX4t886t16t7H?utm_source=generator',
-      },
-    ],
-  });
 
   console.log('Seeding database completed successfully!');
 }

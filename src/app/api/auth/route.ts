@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const cookieSession = req.cookies.get('admin_session')?.value;
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminPassword = process.env.ADMIN_PASSWORD || '310726';
 
   if (cookieSession === adminPassword) {
     return NextResponse.json({ authenticated: true });
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json();
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const adminPassword = process.env.ADMIN_PASSWORD || '310726';
 
     if (password === adminPassword) {
       const response = NextResponse.json({ success: true });
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Incorrect passcode' }, { status: 401 });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Authentication failed' }, { status: 500 });
   }
 }

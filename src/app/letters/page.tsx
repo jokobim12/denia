@@ -82,7 +82,7 @@ export default function LettersPage() {
           <span className="text-rose-400 font-serif text-lg">Heartfelt Words</span>
           <h1 className="text-3xl md:text-4xl font-serif font-light text-sage-900">Surat Digital</h1>
           <p className="text-xs md:text-sm text-sage-900/50 max-w-md mx-auto italic font-sans">
-            "Kumpulan surat yang bisa kamu buka sesuai kondisimu saat ini."
+            &ldquo;Kumpulan surat yang bisa kamu buka sesuai kondisimu saat ini.&rdquo;
           </p>
         </div>
 

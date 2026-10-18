@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAdmin } from '@/lib/auth';
+import { deleteFromSupabaseStorage } from '@/lib/supabase';
+import { Prisma } from '@prisma/client';
 
 export async function DELETE(
   req: NextRequest,
@@ -13,14 +15,24 @@ export async function DELETE(
 
     const { id } = await params;
 
+    const existing = await prisma.timeline.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+
+    if (existing?.imageUrl) {
+      await deleteFromSupabaseStorage(existing.imageUrl);
+    }
+
     await prisma.timeline.delete({
       where: { id },
     });
 
     return NextResponse.json({ message: 'Wish deleted successfully' });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('DELETE wish error:', error);
-    return NextResponse.json({ error: 'Failed to delete wish' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to delete wish';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -36,7 +48,16 @@ export async function PUT(
     const { id } = await params;
     const { title, description, imageUrl, eventDate } = await req.json();
 
-    const dataToUpdate: any = {};
+    const existing = await prisma.timeline.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+
+    if (imageUrl && existing?.imageUrl && existing.imageUrl !== imageUrl) {
+      await deleteFromSupabaseStorage(existing.imageUrl);
+    }
+
+    const dataToUpdate: Prisma.TimelineUpdateInput = {};
     if (title !== undefined) dataToUpdate.title = title;
     if (description !== undefined) dataToUpdate.description = description;
     if (imageUrl !== undefined) dataToUpdate.imageUrl = imageUrl;
@@ -48,8 +69,10 @@ export async function PUT(
     });
 
     return NextResponse.json(wish);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('PUT wish error:', error);
-    return NextResponse.json({ error: 'Failed to update wish' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to update wish';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+

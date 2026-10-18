@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Sparkles, X, Gift } from 'lucide-react';
+import { Heart, Sparkles, X } from 'lucide-react';
 
 interface Wish {
   id: string;
@@ -68,7 +68,7 @@ export default function WishesPage() {
           <span className="text-rose-400 font-serif text-lg">Comfort Jar</span>
           <h1 className="text-3xl md:text-4xl font-serif font-light text-sage-900">Toples Catatan</h1>
           <p className="text-xs md:text-sm text-sage-900/50 max-w-md mx-auto italic font-sans px-4">
-            "Pesan-pesan singkat di dalam toples."
+            &ldquo;Pesan-pesan singkat di dalam toples.&rdquo;
           </p>
         </div>
 

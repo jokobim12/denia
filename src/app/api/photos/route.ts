@@ -7,15 +7,24 @@ export async function GET() {
     const photos = await prisma.photo.findMany({
       orderBy: { eventDate: 'desc' },
     });
-    return NextResponse.json(photos);
-  } catch (error: any) {
+    return NextResponse.json(photos, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
+  } catch (error: unknown) {
     console.error('GET photos error:', error);
-    return NextResponse.json({ error: 'Failed to fetch photos' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to fetch photos';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isAdmin(req)) {
+      return NextResponse.json({ error: 'Akses ditolak: Masukkan sandi rahasia untuk menyimpan foto.' }, { status: 401 });
+    }
+
     const { imageUrl, title, description, eventDate } = await req.json();
 
     if (!imageUrl || !title || !description || !eventDate) {
@@ -32,8 +41,10 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(photo);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('POST photo error:', error);
-    return NextResponse.json({ error: 'Failed to create photo' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to create photo';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+

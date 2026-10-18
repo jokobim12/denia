@@ -37,9 +37,25 @@ model Timeline {
   createdAt   DateTime @default(now())
 }
 
-model Playlist {
-  id        String   @id @default(cuid())
-  title     String
-  embedUrl  String
-  createdAt DateTime @default(now())
+model BucketItem {
+  id          String    @id @default(cuid())
+  title       String
+  category    String    // 'travel', 'food', 'activity', 'dream'
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
 }
+
+model MemorySpot {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  category    String    // 'first-meet', 'date', 'favorite', 'travel'
+  latitude    Float
+  longitude   Float
+  imageUrl    String?
+  date        DateTime?
+  createdAt   DateTime  @default(now())
+}
+

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAdmin } from '@/lib/auth';
+import { Prisma } from '@prisma/client';
 
 export async function DELETE(
   req: NextRequest,
@@ -18,9 +19,10 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: 'Letter deleted successfully' });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('DELETE letter error:', error);
-    return NextResponse.json({ error: 'Failed to delete letter' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to delete letter';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -36,7 +38,7 @@ export async function PUT(
     const { id } = await params;
     const { title, content, category } = await req.json();
 
-    const dataToUpdate: any = {};
+    const dataToUpdate: Prisma.LetterUpdateInput = {};
     if (title !== undefined) dataToUpdate.title = title;
     if (content !== undefined) dataToUpdate.content = content;
     if (category !== undefined) dataToUpdate.category = category;
@@ -47,8 +49,10 @@ export async function PUT(
     });
 
     return NextResponse.json(letter);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('PUT letter error:', error);
-    return NextResponse.json({ error: 'Failed to update letter' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to update letter';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+

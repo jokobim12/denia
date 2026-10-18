@@ -26,7 +26,8 @@ export default function Navbar() {
     { name: 'Galeri', path: '/gallery' },
     { name: 'Surat', path: '/letters' },
     { name: 'Catatan', path: '/wishes' },
-    { name: 'Musik', path: '/music' },
+    { name: 'Impian', path: '/bucket-list' },
+    { name: 'Jejak', path: '/map' },
   ];
 
   return (
@@ -52,6 +53,7 @@ export default function Navbar() {
                 <Link
                   key={item.path}
                   href={item.path}
+                  prefetch={true}
                   className={`relative font-sans text-xs md:text-sm font-medium tracking-wide transition-colors duration-200 py-1 ${
                     isActive ? 'text-rose-900' : 'text-sage-900/60 hover:text-sage-900'
                   }`}
@@ -120,6 +122,7 @@ export default function Navbar() {
                     <Link
                       key={item.path}
                       href={item.path}
+                      prefetch={true}
                       onClick={() => setIsOpen(false)}
                       className={`px-4 py-3 rounded-2xl font-sans text-sm font-medium tracking-wide transition-colors duration-200 ${
                         isActive

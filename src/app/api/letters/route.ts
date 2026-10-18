@@ -7,10 +7,15 @@ export async function GET() {
     const letters = await prisma.letter.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return NextResponse.json(letters);
-  } catch (error: any) {
+    return NextResponse.json(letters, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
+  } catch (error: unknown) {
     console.error('GET letters error:', error);
-    return NextResponse.json({ error: 'Failed to fetch letters' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to fetch letters';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -35,8 +40,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(letter);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('POST letter error:', error);
-    return NextResponse.json({ error: 'Failed to create letter' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to create letter';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

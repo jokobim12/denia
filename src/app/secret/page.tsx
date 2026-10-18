@@ -194,13 +194,13 @@ export default function SecretPage() {
 
                   <div className="space-y-4 font-serif text-sm text-sage-900/80 leading-relaxed italic select-text">
                     <p>
-                      "Terima kasih sudah meluangkan waktu menjelajahi setiap sudut tempat ini."
+                      &ldquo;Terima kasih sudah meluangkan waktu menjelajahi setiap sudut tempat ini.&rdquo;
                     </p>
                     <p>
-                      "Ruang digital sederhana ini dibuat khusus sebagai tempat penyimpanan setiap cerita, canda tawa, dan kenangan."
+                      &ldquo;Ruang digital sederhana ini dibuat khusus sebagai tempat penyimpanan setiap cerita, canda tawa, dan kenangan.&rdquo;
                     </p>
                     <p>
-                      "Semoga hari-harimu selalu menyenangkan. Ingatlah bahwa ada tempat kecil di sini yang selalu terbuka kapan pun kamu ingin merenung atau tersenyum kembali."
+                      &ldquo;Semoga hari-harimu selalu menyenangkan. Ingatlah bahwa ada tempat kecil di sini yang selalu terbuka kapan pun kamu ingin merenung atau tersenyum kembali.&rdquo;
                     </p>
                   </div>
 

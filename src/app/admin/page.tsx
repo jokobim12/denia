@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import {
   Lock,
@@ -9,13 +9,37 @@ import {
   Image as ImageIcon,
   Mail,
   Calendar,
-  Music,
   LogOut,
   Loader2,
-  Trash,
   Heart,
   Edit3
 } from 'lucide-react';
+
+interface AdminPhoto {
+  id: string;
+  imageUrl: string;
+  title: string;
+  description: string;
+  eventDate: string;
+  createdAt: string;
+}
+
+interface AdminLetter {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  createdAt: string;
+}
+
+interface AdminTimeline {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string | null;
+  eventDate: string;
+  createdAt: string;
+}
 
 export default function AdminPage() {
   // Auth state
@@ -29,9 +53,9 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'photos' | 'letters' | 'timeline'>('photos');
 
   // Data states
-  const [photos, setPhotos] = useState<any[]>([]);
-  const [letters, setLetters] = useState<any[]>([]);
-  const [timeline, setTimeline] = useState<any[]>([]);
+  const [photos, setPhotos] = useState<AdminPhoto[]>([]);
+  const [letters, setLetters] = useState<AdminLetter[]>([]);
+  const [timeline, setTimeline] = useState<AdminTimeline[]>([]);
   const [loadingData, setLoadingData] = useState(false);
 
   // Form states
@@ -52,6 +76,12 @@ export default function AdminPage() {
   const photoFileRef = useRef<HTMLInputElement>(null);
   const timelineFileRef = useRef<HTMLInputElement>(null);
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const fetchTabData = useCallback(() => {
+    setRefreshKey((prev) => prev + 1);
+  }, []);
+
   // Verify auth on mount
   useEffect(() => {
     async function checkAuth() {
@@ -70,33 +100,37 @@ export default function AdminPage() {
 
   // Fetch data when authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchTabData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, activeTab]);
+    if (!isAuthenticated) return;
 
-  const fetchTabData = async () => {
-    setLoadingData(true);
-    setActionError('');
-    try {
-      if (activeTab === 'photos') {
-        const res = await fetch('/api/photos');
-        if (res.ok) setPhotos(await res.json());
-      } else if (activeTab === 'letters') {
-        const res = await fetch('/api/letters');
-        if (res.ok) setLetters(await res.json());
-      } else if (activeTab === 'timeline') {
-        const res = await fetch('/api/wishes');
-        if (res.ok) setTimeline(await res.json());
+    let ignore = false;
+    async function loadData() {
+      setLoadingData(true);
+      setActionError('');
+      try {
+        if (activeTab === 'photos') {
+          const res = await fetch('/api/photos');
+          if (res.ok && !ignore) setPhotos(await res.json());
+        } else if (activeTab === 'letters') {
+          const res = await fetch('/api/letters');
+          if (res.ok && !ignore) setLetters(await res.json());
+        } else if (activeTab === 'timeline') {
+          const res = await fetch('/api/wishes');
+          if (res.ok && !ignore) setTimeline(await res.json());
+        }
+      } catch (err: unknown) {
+        console.error(err);
+        if (!ignore) setActionError('Gagal memuat data.');
+      } finally {
+        if (!ignore) setLoadingData(false);
       }
-    } catch (err) {
-      console.error(err);
-      setActionError('Gagal memuat data.');
-    } finally {
-      setLoadingData(false);
     }
-  };
+
+    loadData();
+
+    return () => {
+      ignore = true;
+    };
+  }, [isAuthenticated, activeTab, refreshKey]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,30 +182,33 @@ export default function AdminPage() {
     return data.url;
   };
 
-  const handleEditClick = (item: any, type: 'photos' | 'letters' | 'timeline') => {
+  const handleEditClick = (item: AdminPhoto | AdminLetter | AdminTimeline, type: 'photos' | 'letters' | 'timeline') => {
     setActiveTab(type);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (type === 'photos') {
-      setEditingPhotoId(item.id);
+      const photo = item as AdminPhoto;
+      setEditingPhotoId(photo.id);
       setPhotoForm({
-        title: item.title,
-        description: item.description,
-        eventDate: new Date(item.eventDate).toISOString().split('T')[0],
+        title: photo.title,
+        description: photo.description,
+        eventDate: new Date(photo.eventDate).toISOString().split('T')[0],
         file: null, 
       });
     } else if (type === 'letters') {
-      setEditingLetterId(item.id);
+      const letter = item as AdminLetter;
+      setEditingLetterId(letter.id);
       setLetterForm({
-        title: item.title,
-        content: item.content,
-        category: item.category,
+        title: letter.title,
+        content: letter.content,
+        category: letter.category,
       });
     } else if (type === 'timeline') {
-      setEditingTimelineId(item.id);
+      const tl = item as AdminTimeline;
+      setEditingTimelineId(tl.id);
       setTimelineForm({
-        title: item.title,
-        description: item.description,
-        eventDate: item.eventDate ? new Date(item.eventDate).toISOString().split('T')[0] : '',
+        title: tl.title,
+        description: tl.description,
+        eventDate: tl.eventDate ? new Date(tl.eventDate).toISOString().split('T')[0] : '',
         file: null,
       });
     }
@@ -226,8 +263,9 @@ export default function AdminPage() {
         const err = await res.json();
         throw new Error(err.error || 'Gagal menyimpan foto.');
       }
-    } catch (err: any) {
-      setActionError(err.message || 'Terjadi kesalahan.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan.';
+      setActionError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -254,8 +292,9 @@ export default function AdminPage() {
         const err = await res.json();
         throw new Error(err.error || 'Gagal menyimpan surat.');
       }
-    } catch (err: any) {
-      setActionError(err.message || 'Terjadi kesalahan.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan.';
+      setActionError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -291,14 +330,13 @@ export default function AdminPage() {
         const err = await res.json();
         throw new Error(err.error || 'Gagal menyimpan item linimasa.');
       }
-    } catch (err: any) {
-      setActionError(err.message || 'Terjadi kesalahan.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan.';
+      setActionError(msg);
     } finally {
       setSubmitting(false);
     }
   };
-
-
 
   // Handle deletes
   const handleDeleteItem = async (id: string, type: 'photos' | 'letters' | 'timeline') => {
@@ -314,7 +352,7 @@ export default function AdminPage() {
         const err = await res.json();
         alert(err.error || 'Gagal menghapus item.');
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
       alert('Terjadi kesalahan saat menghapus.');
     }

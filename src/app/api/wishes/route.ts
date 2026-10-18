@@ -7,10 +7,15 @@ export async function GET() {
     const wishes = await prisma.timeline.findMany({
       orderBy: { createdAt: 'desc' },
     });
-    return NextResponse.json(wishes);
-  } catch (error: any) {
+    return NextResponse.json(wishes, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
+  } catch (error: unknown) {
     console.error('GET wishes error:', error);
-    return NextResponse.json({ error: 'Failed to fetch wishes' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to fetch wishes';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -36,8 +41,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(wish);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('POST wish error:', error);
-    return NextResponse.json({ error: 'Failed to create wish' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to create wish';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
