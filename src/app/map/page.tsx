@@ -180,7 +180,8 @@ export default function MapPage() {
           body: formData,
         });
         if (!uploadRes.ok) {
-          throw new Error('Gagal mengunggah foto. Pastikan ukuran di bawah 6MB.');
+          const errData = await uploadRes.json().catch(() => ({}));
+          throw new Error(errData.error || 'Gagal mengunggah foto.');
         }
         const uploadData = await uploadRes.json();
         uploadedImageUrl = uploadData.url;
@@ -233,7 +234,10 @@ export default function MapPage() {
           method: 'POST',
           body: formData,
         });
-        if (!uploadRes.ok) throw new Error('Gagal mengunggah foto.');
+        if (!uploadRes.ok) {
+          const errData = await uploadRes.json().catch(() => ({}));
+          throw new Error(errData.error || 'Gagal mengunggah foto.');
+        }
         const { url: imageUrl } = await uploadRes.json();
 
         const patchRes = await fetch('/api/memory-spots', {
@@ -249,9 +253,10 @@ export default function MapPage() {
             setSelectedSpot(updated);
           }
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error(err);
-        alert('Gagal menambahkan foto ke titik ini.');
+        const msg = err instanceof Error ? err.message : 'Gagal menambahkan foto ke titik ini.';
+        alert(msg);
       }
     });
   };

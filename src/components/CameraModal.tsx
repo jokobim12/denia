@@ -269,7 +269,10 @@ export default function CameraModal({ isOpen, onClose, onSuccess }: CameraModalP
       const formData = new FormData();
       formData.append('file', imageBlob);
       const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
-      if (!uploadRes.ok) throw new Error('Gagal mengunggah foto.');
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({}));
+        throw new Error(errData.error || 'Gagal mengunggah foto.');
+      }
       const { url: imageUrl } = await uploadRes.json();
       
       const finalDesc = isPhotoboothResult ? `${description} #photobooth` : description;
