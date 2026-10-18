@@ -66,31 +66,8 @@ export default function HomePage() {
         <div className="absolute bottom-[20%] right-[15%] w-[400px] h-[400px] rounded-full bg-sage-100/40 blur-[100px]" />
       </div>
 
-      {/* Top Header Bar */}
-      <header className="sticky top-0 z-30 bg-cream-50/85 backdrop-blur-md border-b border-cream-200/50">
-        <div className="flex justify-between items-center max-w-5xl mx-auto px-6 py-3.5">
-          <button
-            onClick={handleSecretClick}
-            className="flex items-center gap-2 text-sage-900/70 hover:text-rose-500 transition-colors group cursor-pointer focus:outline-none"
-            title="Klik 5 kali untuk kejutan rahasia"
-          >
-            <div className="p-1.5 bg-rose-50 rounded-lg group-hover:bg-rose-100 transition-colors">
-              <Heart className="h-4 w-4 text-rose-400 fill-rose-100 group-hover:scale-110 transition-transform duration-300" />
-            </div>
-            <span className="font-serif font-medium tracking-wide text-sm">Denia</span>
-          </button>
-          
-          <nav className="flex items-center gap-4 text-xs font-sans tracking-wide text-sage-900/60">
-            <Link href="/gallery" className="hover:text-rose-500 transition-colors">Galeri</Link>
-            <Link href="/letters" className="hover:text-rose-500 transition-colors">Surat</Link>
-            <Link href="/bucket-list" className="hover:text-rose-500 transition-colors">Impian</Link>
-            <Link href="/map" className="hover:text-rose-500 transition-colors">Jejak</Link>
-          </nav>
-        </div>
-      </header>
-
-      {/* Center Section: Greeting & Love Days Counter */}
-      <div className="flex-grow flex flex-col items-center justify-center px-6 py-6 max-w-3xl mx-auto w-full text-center">
+      {/* Center Section: Greeting & Love Days Counter (Tanpa Navbar Atas) */}
+      <div className="flex-grow flex flex-col items-center justify-center px-6 py-8 max-w-3xl mx-auto w-full text-center">
         {/* Greeting */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -98,12 +75,16 @@ export default function HomePage() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="space-y-2 mb-8"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-cream-200 text-[10px] sm:text-[11px] font-sans tracking-widest text-sage-900/60 uppercase">
-            <Sparkles className="h-3 w-3 text-rose-300" />
-            <span>Digital Scrapbook</span>
-          </div>
+          <button
+            onClick={handleSecretClick}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/70 hover:bg-white border border-cream-200 text-[10px] sm:text-[11px] font-sans tracking-widest text-sage-900/60 hover:text-rose-500 uppercase transition-colors cursor-pointer"
+            title="Klik 5 kali untuk kejutan rahasia"
+          >
+            <Heart className="h-3.5 w-3.5 text-rose-400 fill-rose-100" />
+            <span>Digital Scrapbook Denia</span>
+          </button>
           
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif text-sage-900 font-light tracking-tight select-text">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif text-sage-900 font-light tracking-tight select-text pt-2">
             Halo, {visitorName}
           </h1>
           
