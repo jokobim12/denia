@@ -227,13 +227,6 @@ export default function Celebration100DaysModal({
                   </AnimatePresence>
                 </motion.button>
               </div>
-
-              {/* Preview Notice for Joko if in testing mode */}
-              {isPreview && (
-                <div className="mt-3 p-2 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-800">
-                  ⚡ <strong>Mode Testing:</strong> Ini tampilan preview 100 hari. Begitu countdown asli mencapai 100 hari nanti, tampilan ini akan otomatis aktif sendiri untuk Denia!
-                </div>
-              )}
             </div>
           </motion.div>
         </div>
